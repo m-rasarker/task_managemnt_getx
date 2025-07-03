@@ -31,9 +31,11 @@ dev_dependencies:
   http:
 
 
-  flutter_lints: ^3.0.0
-  flutter_svg:
 
+  flutter_lints: ^3.0.0
+  flutter_svg: 2.1.0
+  email_validator: ^3.0.0
+  pin_code_fields: ^8.0.1
 # The following section is specific to Flutter packages.
 flutter:
 
