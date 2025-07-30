@@ -2,10 +2,12 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ruhul_ostab_project/data/models/user_model.dart';
-
-class AuthController {
+import 'package:get/get.dart';
+class AuthController extends GetxController{
   static UserModel? userModel;
   static String? accessToken;
+
+
 
   static const String _userDataKey = 'user-data';
   static const String _tokenKey = 'token';
@@ -16,12 +18,14 @@ class AuthController {
     await sharedPreferences.setString(_tokenKey, token);
     userModel = model;
     accessToken = token;
+
   }
 
   static Future<void> updateUserData(UserModel model) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(_userDataKey, jsonEncode(model.toJson()));
     userModel = model;
+
   }
 
   static Future<void> getUserData() async {
@@ -49,4 +53,6 @@ class AuthController {
     accessToken = null;
     userModel = null;
   }
+
+
 }

@@ -134,10 +134,14 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
       // Navigator.pushNamedAndRemoveUntil(
       //     context,  PinVerificationScreen.name, (predicate) => false);
 
-      Navigator.pushNamed(
-          context,  PinVerificationScreen.name,arguments: {
-        'emailid': _emailTEController.text.trim()});
+      // Navigator.pushNamed(
+      //     context,  PinVerificationScreen.name,arguments: {
+      //   'emailid': _emailTEController.text.trim()});
+      //
+      //
 
+      Get.offAllNamed(PinVerificationScreen.name,arguments: {
+          'emailid': _emailTEController.text.trim()});
 
 
     } else {
@@ -150,7 +154,8 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
 
 
   void _onTapSignInButton() {
-    Navigator.pop(context);
+   // Navigator.pop(context);
+    Get.back();
   }
 
   @override
