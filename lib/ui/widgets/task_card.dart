@@ -13,8 +13,10 @@ class TaskCard extends StatefulWidget {
     super.key,
     required this.taskType,
     required this.taskModel,
-    required this.onStatusUpdate,
+    required this.onStatusUpdate
   });
+
+
 
   final TaskType taskType;
   final TaskModel taskModel;
@@ -23,6 +25,8 @@ class TaskCard extends StatefulWidget {
   @override
   State<TaskCard> createState() => _TaskCardState();
 }
+
+
 
 class _TaskCardState extends State<TaskCard> {
   bool _updateTaskStatusInProgress = false;
@@ -94,6 +98,10 @@ class _TaskCardState extends State<TaskCard> {
     }
   }
 
+
+
+
+
   String _getTaskTypeName() {
     switch (widget.taskType) {
       case TaskType.tNew:
@@ -106,6 +114,14 @@ class _TaskCardState extends State<TaskCard> {
         return 'Cancelled';
     }
   }
+
+
+
+
+
+
+
+
 
   void _showEditTaskStatusDialog() {
     showDialog(

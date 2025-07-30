@@ -1,8 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:ruhul_ostab_project/ui/controllers/change_password_controller.dart';
 import 'package:ruhul_ostab_project/ui/screens/sign_in_screen.dart';
 import 'package:ruhul_ostab_project/ui/widgets/screen_background.dart';
-
+import 'package:get/get.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/urls.dart';
 import '../widgets/centered_circular_progress_indicator.dart';
@@ -28,22 +29,30 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final TextEditingController _confirmPasswordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String? email='';
-  late String? otpCode='';
+  final ChangePasswordController _changePasswordController = Get.find<ChangePasswordController>();
+  late String? email;
+  late String? otpCode;
   bool _changePasswordProgress=false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    email='${widget.emailid}';
-     otpCode='${widget.otpcode}';
 
 
   }
 
   @override
   Widget build(BuildContext context) {
+
+    final Map<String, dynamic> args =
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+     email = args['emailid'];
+    otpCode = args['otpcode'];
+
+  //  print(email.toString() + '  ' +  otpCode.toString());
+
     return Scaffold(
       body: ScreenBackground(
         child: SingleChildScrollView(
@@ -155,15 +164,24 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
 
+
+
   Future<void> _changePassword() async {
-    _changePasswordProgress = true;
-    setState(() {});
+    final bool isSuccess = await _changePasswordController.ChangePassword('$email', '$otpCode', _confirmPasswordTEController.text.trim());
+
+    // Map<String, String> requestBody = {
+    //   "email": ChangePasswordScreen.email.toString(),
+    //   "OTP": ChangePasswordScreen.otpCode.toString(),
+    //   "password":_confirmPasswordTEController.text.toString()
+    // };
+
 
     Map<String, String> requestBody = {
-      "email": ChangePasswordScreen.email.toString(),
-      "OTP": ChangePasswordScreen.otpCode.toString(),
+      "email": email.toString(),
+      "OTP": otpCode.toString(),
       "password":_confirmPasswordTEController.text.toString()
     };
+
 
     NetworkResponse response = await NetworkCaller.postRequest(
       url: Urls.RecoverResetPasswordUrl,
@@ -171,13 +189,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
 
     if (response.isSuccess) {
-      _changePasswordProgress = false;
-      setState(() {});
-      showSnackBarMessage(context, "Password Changed Successfully");
+      if(mounted) {
+        showSnackBarMessage(context, "Password Changed Successfully");
+      }
       Navigator.pushReplacementNamed(context, SignInScreen.name);
     } else {
-      _changePasswordProgress = false;
-      setState(() {});
       if (mounted)
       {
         showSnackBarMessage(context, response.errorMessage!);

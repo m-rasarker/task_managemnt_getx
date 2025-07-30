@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:ruhul_ostab_project/ui/controllers/completed_task_list_controller.dart';
+import 'package:get/get.dart';
 import '../../../data/models/task_model.dart';
 import '../../../data/service/network_caller.dart';
 import '../../../data/urls.dart';
@@ -16,8 +17,7 @@ class CompletedTaskListScreen extends StatefulWidget {
 }
 
 class _CompletedTaskListScreenState extends State<CompletedTaskListScreen> {
-  bool _getCompletedTasksInProgress = false;
-  List<TaskModel> _CompletedTaskList = [];
+  final CompletedTaskListController _completedTaskListController = Get.find<CompletedTaskListController>();
 
   @override
   void initState() {
@@ -32,47 +32,42 @@ class _CompletedTaskListScreenState extends State<CompletedTaskListScreen> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child:Visibility(
-         visible: _getCompletedTasksInProgress == false,
-          replacement: CenteredCircularProgressIndicator(),
-        child: ListView.builder(
-          itemCount: _CompletedTaskList.length,
-          itemBuilder: (context, index) {
-            return TaskCard(
-              taskType: TaskType.completed,
-              taskModel: _CompletedTaskList[index],
-              onStatusUpdate: () {
-                _getCompletedTaskList();
+      child:GetBuilder<CompletedTaskListController>(
+        builder: (controller) {
+          return Visibility(
+             visible: controller.inProgress == false,
+              replacement: CenteredCircularProgressIndicator(),
+            child: ListView.builder(
+              itemCount: controller.completedTaskList.length,
+              itemBuilder: (context, index) {
+                return TaskCard(
+                  taskType: TaskType.completed,
+                  taskModel: controller.completedTaskList[index],
+                  onStatusUpdate: () {
+                    _getCompletedTaskList();
+                  },
+                );
               },
-            );
-          },
-        ),
+            ),
+          );
+        }
       ),
     );
   }
 
 
   Future<void> _getCompletedTaskList() async {
-    _getCompletedTasksInProgress = true;
-    setState(() {});
+    final bool isSuccess = await _completedTaskListController.getCompletedTaskList();
 
-    NetworkResponse response = await NetworkCaller
-        .getRequest(url: Urls.getCompletedTasksUrl);
+    if (isSuccess) {
 
-    if (response.isSuccess) {
-      List<TaskModel> list = [];
-      for (Map<String, dynamic> jsonData in response.body!['data']) {
-        list.add(TaskModel.fromJson(jsonData));
-      }
-      _CompletedTaskList = list;
+
     } else {
-      showSnackBarMessage(context, response.errorMessage!);
+      if (mounted) {
+        showSnackBarMessage(context, _completedTaskListController.errorMessage!);
+      }
     }
-
-    _getCompletedTasksInProgress = false;
-    setState(() {});
   }
-
 
 
 }

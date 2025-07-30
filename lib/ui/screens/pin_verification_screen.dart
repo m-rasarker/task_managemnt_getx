@@ -1,10 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:ruhul_ostab_project/ui/controllers/pin_verification_controller.dart';
 import 'package:ruhul_ostab_project/ui/screens/change_password_screen.dart';
 import 'package:ruhul_ostab_project/ui/screens/sign_in_screen.dart';
 import 'package:ruhul_ostab_project/ui/widgets/screen_background.dart';
-
+import 'package:get/get.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/urls.dart';
 import '../widgets/centered_circular_progress_indicator.dart';
@@ -31,8 +32,9 @@ class PinVerificationScreen extends StatefulWidget {
 class _PinVerificationScreenState extends State<PinVerificationScreen> {
   final TextEditingController _otpTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String? email ="";
-  late String? otp ="";
+  final PinVerificationController _pinVerificationController =Get.find<PinVerificationController>();
+  late String? email;
+
 
   bool _pinverityProgress =false;
 
@@ -48,6 +50,13 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final Map<String, dynamic> args =
+    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    email = args['emailid'];
+
+
+
     return Scaffold(
       body: ScreenBackground(
         child: SingleChildScrollView(
@@ -107,13 +116,17 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
                     appContext: context,
                   ),
                   const SizedBox(height: 16),
-                  Visibility(
-                    visible: _pinverityProgress==false,
-                    replacement: CenteredCircularProgressIndicator(),
-                    child: ElevatedButton(
-                      onPressed: _onTapSubmitButton,
-                      child: Text('Verify'),
-                    ),
+                  GetBuilder<PinVerificationController>(
+                    builder: (controller) {
+                      return Visibility(
+                        visible: controller.inProgress==false,
+                        replacement: CenteredCircularProgressIndicator(),
+                        child: ElevatedButton(
+                          onPressed: _onTapSubmitButton,
+                          child: Text('Verify'),
+                        ),
+                      );
+                    }
                   ),
                   const SizedBox(height: 32),
                   Center(
@@ -160,22 +173,27 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
   }
 
   Future<void> _pinverity() async {
-    _pinverityProgress = true;
-    setState(() {});
+    final bool isSuccess = await _pinVerificationController.Pinverity('$email',_otpTEController.text.trim());
 
-    NetworkResponse response = await NetworkCaller.getRequest(
-        url: Urls.RecoverVerifyOtpEmail(ForgotPasswordEmailScreen.emailid ,_otpTEController.text)
-    );
 
-    if (response.isSuccess) {
-      _pinverityProgress = false;
-      setState(() {});
-      Navigator.pushNamed(context, ChangePasswordScreen.name);
 
-    } else {
-      _pinverityProgress = false;
-      setState(() {});
-      showSnackBarMessage(context, response.errorMessage!);
+
+    if (isSuccess) {
+
+      // Navigator.pushNamed(context, ChangePasswordScreen.name, arguments: {
+      //   'emailid': ForgotPasswordEmailScreen.emailid,
+      //   'otpcode': _otpTEController.text,
+      // },);
+
+      Get.toNamed(ChangePasswordScreen.name,arguments: {
+        'emailid': '$email',
+        'otpcode': _otpTEController.text});
+
+    } else
+    {
+        if(mounted) {
+          showSnackBarMessage(context, _pinVerificationController.errorMessage!);
+        }
     }
 
   }

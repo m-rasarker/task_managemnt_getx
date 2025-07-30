@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ruhul_ostab_project/data/models/user_model.dart';
 import 'package:ruhul_ostab_project/ui/controllers/auth_controller.dart';
 
 import 'package:ruhul_ostab_project/ui/screens/sign_in_screen.dart';
@@ -22,7 +23,6 @@ class _TMAppBarState extends State<TMAppBar> {
       backgroundColor: Colors.green,
       title: GestureDetector(
         onTap: _onTapProfileBar,
-
         child: Row(
           children: [
             CircleAvatar(),
