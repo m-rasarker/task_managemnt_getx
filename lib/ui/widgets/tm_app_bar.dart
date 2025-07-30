@@ -22,6 +22,7 @@ class _TMAppBarState extends State<TMAppBar> {
       backgroundColor: Colors.green,
       title: GestureDetector(
         onTap: _onTapProfileBar,
+
         child: Row(
           children: [
             CircleAvatar(),
