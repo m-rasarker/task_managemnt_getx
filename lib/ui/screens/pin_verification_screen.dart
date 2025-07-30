@@ -5,10 +5,23 @@ import 'package:ruhul_ostab_project/ui/screens/change_password_screen.dart';
 import 'package:ruhul_ostab_project/ui/screens/sign_in_screen.dart';
 import 'package:ruhul_ostab_project/ui/widgets/screen_background.dart';
 
+import '../../data/service/network_caller.dart';
+import '../../data/urls.dart';
+import '../widgets/centered_circular_progress_indicator.dart';
+import '../widgets/snack_bar_message.dart';
+import 'forgot_password_email_screen.dart';
+
 class PinVerificationScreen extends StatefulWidget {
-  const PinVerificationScreen({super.key});
+  const PinVerificationScreen({super.key, this.emailid, this.otpcode});
+  final String? emailid;
+  final String? otpcode;
+
 
   static const String name = '/pin-verification';
+  static String? otp;
+  static String? email;
+
+
 
   @override
   State<PinVerificationScreen> createState() =>
@@ -18,6 +31,20 @@ class PinVerificationScreen extends StatefulWidget {
 class _PinVerificationScreenState extends State<PinVerificationScreen> {
   final TextEditingController _otpTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late String? email ="";
+  late String? otp ="";
+
+  bool _pinverityProgress =false;
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    PinVerificationScreen.email='${widget.emailid}';
+    PinVerificationScreen.otp='${widget.otpcode}';
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +77,7 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
                   ),
                   const SizedBox(height: 24),
                   PinCodeTextField(
+
                     length: 6,
                     animationType: AnimationType.fade,
                     keyboardType: TextInputType.number,
@@ -65,12 +93,27 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
                     animationDuration: Duration(milliseconds: 300),
                     backgroundColor: Colors.transparent,
                     controller: _otpTEController,
+                    validator: (String? value) {
+                      String otpv = value ?? '';
+                      if (otpv.length<6){
+                        return 'Enter a valid 6 digit pin';
+                      }
+                      else
+                      {
+                        PinVerificationScreen.otp = otpv.toString();
+                        return null;
+                      }
+                    },
                     appContext: context,
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _onTapSubmitButton,
-                    child: Text('Verify'),
+                  Visibility(
+                    visible: _pinverityProgress==false,
+                    replacement: CenteredCircularProgressIndicator(),
+                    child: ElevatedButton(
+                      onPressed: _onTapSubmitButton,
+                      child: Text('Verify'),
+                    ),
                   ),
                   const SizedBox(height: 32),
                   Center(
@@ -107,11 +150,39 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
   }
 
   void _onTapSubmitButton() {
-    // if (_formKey.currentState!.validate()) {
-    //   // TODO: Sign in with API
-    // }
-    Navigator.pushNamed(context, ChangePasswordScreen.name);
+    if (_formKey.currentState!.validate()) {
+      _pinverity();
+
+    }
+
+
+
   }
+
+  Future<void> _pinverity() async {
+    _pinverityProgress = true;
+    setState(() {});
+
+    NetworkResponse response = await NetworkCaller.getRequest(
+        url: Urls.RecoverVerifyOtpEmail(ForgotPasswordEmailScreen.emailid ,_otpTEController.text)
+    );
+
+    if (response.isSuccess) {
+      _pinverityProgress = false;
+      setState(() {});
+      Navigator.pushNamed(context, ChangePasswordScreen.name);
+
+    } else {
+      _pinverityProgress = false;
+      setState(() {});
+      showSnackBarMessage(context, response.errorMessage!);
+    }
+
+  }
+
+
+
+
 
   void _onTapSignInButton() {
     Navigator.pushNamedAndRemoveUntil(

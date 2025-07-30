@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+
 import 'package:ruhul_ostab_project/ui/screens/change_password_screen.dart';
 import 'package:ruhul_ostab_project/ui/screens/forgot_password_email_screen.dart';
+import 'package:ruhul_ostab_project/ui/screens/pages/add_new_task_screen.dart';
+import 'package:ruhul_ostab_project/ui/screens/pages/main_nav_bar_holder_screen.dart';
+import 'package:ruhul_ostab_project/ui/screens/pages/update_profile_screen.dart';
 import 'package:ruhul_ostab_project/ui/screens/pin_verification_screen.dart';
 import 'package:ruhul_ostab_project/ui/screens/sign_in_screen.dart';
 import 'package:ruhul_ostab_project/ui/screens/splash_screen.dart';
+
 
 import 'ui/screens/sign_up_screen.dart';
 
 class TaskManagerApp extends StatelessWidget {
   const TaskManagerApp({super.key});
 
+  static GlobalKey<NavigatorState> navigator = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigator,
       theme: ThemeData(
         colorSchemeSeed: Colors.green,
         textTheme: TextTheme(
@@ -49,9 +57,12 @@ class TaskManagerApp extends StatelessWidget {
         SignInScreen.name: (context) => SignInScreen(),
         SignUpScreen.name: (context) => SignUpScreen(),
         ForgotPasswordEmailScreen.name:
-            (context) => ForgotPasswordEmailScreen(),
-        PinVerificationScreen.name: (context) => PinVerificationScreen(),
-        ChangePasswordScreen.name: (context) => ChangePasswordScreen()
+            (context) => const ForgotPasswordEmailScreen(),
+        PinVerificationScreen.name: (context) => PinVerificationScreen(emailid: ForgotPasswordEmailScreen.emailid,otpcode: PinVerificationScreen.otp),
+        ChangePasswordScreen.name: (context) =>  ChangePasswordScreen(emailid: ForgotPasswordEmailScreen.emailid,otpcode: PinVerificationScreen.otp),
+        MainNavBarHolderScreen.name: (context) => const MainNavBarHolderScreen(),
+        AddNewTaskScreen.name: (context) => const AddNewTaskScreen(),
+        UpdateProfileScreen.name: (context) => const UpdateProfileScreen()
       },
     );
   }

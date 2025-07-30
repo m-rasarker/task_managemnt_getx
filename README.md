@@ -2,7 +2,7 @@
 
 A new Flutter project.
 
-# flutter version : 3.22.3
+# flutter version : Flutter 3.22.3
 
 ## Getting Started
 

@@ -4,10 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:ruhul_ostab_project/ui/screens/pin_verification_screen.dart';
 import 'package:ruhul_ostab_project/ui/widgets/screen_background.dart';
 
+import '../../data/service/network_caller.dart';
+import '../../data/urls.dart';
+import '../widgets/centered_circular_progress_indicator.dart';
+import '../widgets/snack_bar_message.dart';
+
 class ForgotPasswordEmailScreen extends StatefulWidget {
   const ForgotPasswordEmailScreen({super.key});
 
   static const String name = '/forgot-password-email';
+  static String emailid="";
+
+
 
   @override
   State<ForgotPasswordEmailScreen> createState() =>
@@ -17,7 +25,7 @@ class ForgotPasswordEmailScreen extends StatefulWidget {
 class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
   final TextEditingController _emailTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+ bool _emailverityProgress =false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,13 +65,18 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
                       if (EmailValidator.validate(email) == false) {
                         return 'Enter a valid email';
                       }
+                      ForgotPasswordEmailScreen.emailid= value!;
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _onTapSubmitButton,
-                    child: Icon(Icons.arrow_circle_right_outlined),
+                  Visibility(
+                    visible: _emailverityProgress==false,
+                    replacement: CenteredCircularProgressIndicator(),
+                    child: ElevatedButton(
+                      onPressed: _onTapSubmitButton,
+                      child: Icon(Icons.arrow_circle_right_outlined),
+                    ),
                   ),
                   const SizedBox(height: 32),
                   Center(
@@ -100,11 +113,34 @@ class _ForgotPasswordEmailScreenState extends State<ForgotPasswordEmailScreen> {
   }
 
   void _onTapSubmitButton() {
-    // if (_formKey.currentState!.validate()) {
-    //   // TODO: Sign in with API
-    // }
-    Navigator.pushNamed(context, PinVerificationScreen.name);
+    if (_formKey.currentState!.validate()) {
+      _emailverity();
+    }
+
+
   }
+
+  Future<void> _emailverity() async {
+    _emailverityProgress = true;
+    setState(() {});
+
+    NetworkResponse response = await NetworkCaller.getRequest(
+        url: Urls.RecoverVerifyEmail(_emailTEController.text.trim())
+    );
+
+    if (response.isSuccess) {
+      _emailverityProgress = false;
+      setState(() {});
+      Navigator.pushNamedAndRemoveUntil(
+          context,  PinVerificationScreen.name, (predicate) => false);
+    } else {
+      _emailverityProgress = false;
+      setState(() {});
+      showSnackBarMessage(context, response.errorMessage!);
+    }
+  }
+
+
 
   void _onTapSignInButton() {
     Navigator.pop(context);

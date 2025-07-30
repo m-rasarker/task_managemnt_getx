@@ -3,10 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:ruhul_ostab_project/ui/screens/sign_in_screen.dart';
 import 'package:ruhul_ostab_project/ui/widgets/screen_background.dart';
 
+import '../../data/service/network_caller.dart';
+import '../../data/urls.dart';
+import '../widgets/centered_circular_progress_indicator.dart';
+import '../widgets/snack_bar_message.dart';
+
 class ChangePasswordScreen extends StatefulWidget {
-  const ChangePasswordScreen({super.key});
+  const ChangePasswordScreen({super.key, this.emailid, this.otpcode});
+  final String? emailid;
+  final String? otpcode;
+
 
   static const String name = '/change-password';
+  static String? email;
+  static String? otpCode;
+
 
   @override
   State<ChangePasswordScreen> createState() =>
@@ -17,6 +28,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final TextEditingController _confirmPasswordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late String? email='';
+  late String? otpCode='';
+  bool _changePasswordProgress=false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    email='${widget.emailid}';
+     otpCode='${widget.otpcode}';
+
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +81,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       if ((value?.length ?? 0) <= 6) {
                         return 'Enter a valid password';
                       }
+                      ChangePasswordScreen.email=email.toString();
+                      ChangePasswordScreen.otpCode=otpCode;
+
                       return null;
                     },
                   ),
@@ -70,13 +97,20 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       if ((value ?? '') != _passwordTEController.text) {
                         return "Confirm password doesn't match";
                       }
+                      ChangePasswordScreen.email=email.toString();
+                      ChangePasswordScreen.otpCode=otpCode;
+
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _onTapSubmitButton,
-                    child: Text('Confirm'),
+                  Visibility(
+                    visible: _changePasswordProgress==false,
+                    replacement: CenteredCircularProgressIndicator(),
+                    child: ElevatedButton(
+                      onPressed: _onTapSubmitButton,
+                      child: Text('Confirm'),
+                    ),
                   ),
                   const SizedBox(height: 32),
                   Center(
@@ -113,10 +147,46 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   void _onTapSubmitButton() {
-    // if (_formKey.currentState!.validate()) {
-    //   // TODO: Sign in with API
-    // }
+    if (_formKey.currentState!.validate()) {
+      _changePassword();
+
+
+    }
   }
+
+
+  Future<void> _changePassword() async {
+    _changePasswordProgress = true;
+    setState(() {});
+
+    Map<String, String> requestBody = {
+      "email": ChangePasswordScreen.email.toString(),
+      "OTP": ChangePasswordScreen.otpCode.toString(),
+      "password":_confirmPasswordTEController.text.toString()
+    };
+
+    NetworkResponse response = await NetworkCaller.postRequest(
+      url: Urls.RecoverResetPasswordUrl,
+      body: requestBody,
+    );
+
+    if (response.isSuccess) {
+      _changePasswordProgress = false;
+      setState(() {});
+      showSnackBarMessage(context, "Password Changed Successfully");
+      Navigator.pushReplacementNamed(context, SignInScreen.name);
+    } else {
+      _changePasswordProgress = false;
+      setState(() {});
+      if (mounted)
+      {
+        showSnackBarMessage(context, response.errorMessage!);
+      }
+    }
+  }
+
+
+
 
   void _onTapSignInButton() {
     Navigator.pushNamedAndRemoveUntil(
