@@ -16,9 +16,9 @@ class TMAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _TMAppBarState extends State<TMAppBar> {
-  final AuthController _authController = Get.find<AuthController>();
- // final AuthController _authController = AuthController();
-
+ // final AuthController _authController = Get.find<AuthController>();
+  final AuthController _authController = AuthController();
+  final authController = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -37,7 +37,8 @@ class _TMAppBarState extends State<TMAppBar> {
                     init: _authController,
                     builder: (control) {
                       return Text(
-                        AuthController.userModel!.fullName,
+                         AuthController.userModel!.fullName,
+                       // authController.userName.value,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -69,14 +70,20 @@ class _TMAppBarState extends State<TMAppBar> {
   }
 
   void _onTapLogOutButton() {
-    Navigator.pushNamedAndRemoveUntil(
-        context, SignInScreen.name, (predicate) => false);
+    // Navigator.pushNamedAndRemoveUntil(
+    //     context, SignInScreen.name, (predicate) => false);
+
+    Get.offAllNamed(SignInScreen.name);
        AuthController.clearData();
   }
 
+
+
   void _onTapProfileBar() {
     if (ModalRoute.of(context)!.settings.name != UpdateProfileScreen.name) {
-      Navigator.pushNamed(context, UpdateProfileScreen.name);
+    //  Navigator.pushNamed(context, UpdateProfileScreen.name);
+      Get.toNamed(UpdateProfileScreen.name);
+
     }
   }
 }

@@ -203,8 +203,11 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
 
 
   void _onTapSignInButton() {
-    Navigator.pushNamedAndRemoveUntil(
-        context, SignInScreen.name, (predicate) => false);
+    // Navigator.pushNamedAndRemoveUntil(
+    //     context, SignInScreen.name, (predicate) => false);
+    Get.offAllNamed(SignInScreen.name);
+
+
   }
 
   @override

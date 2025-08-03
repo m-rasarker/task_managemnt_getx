@@ -8,7 +8,7 @@ import 'package:ruhul_ostab_project/ui/controllers/new_task_list_controller.dart
 import 'package:ruhul_ostab_project/ui/controllers/pin_verification_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/progress_task_list_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/sign_in_controller.dart';
-import 'package:ruhul_ostab_project/ui/controllers/sign_up_controller.dart';
+import 'package:ruhul_ostab_project/ui/controllers/update_profile_controller.dart';
 import 'package:ruhul_ostab_project/ui/screens/pages/update_profile_screen.dart';
 
 import 'controllers/cancelled_task_list_controller.dart';
@@ -27,8 +27,7 @@ class ControllerBinder extends Bindings {
     Get.put(PinVerificationController());
     Get.put(ChangePasswordController());
     Get.put(AuthController());
-    Get.put(UpdateProfileScreen());
-    Get.put(SignUpController());
+    Get.put(UpdateProfileController());
 
 
   }

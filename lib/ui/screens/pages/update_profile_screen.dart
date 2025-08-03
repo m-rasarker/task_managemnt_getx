@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ruhul_ostab_project/data/models/user_model.dart';
 import 'package:ruhul_ostab_project/data/service/network_caller.dart';
 import 'package:ruhul_ostab_project/data/urls.dart';
 import 'package:ruhul_ostab_project/ui/controllers/auth_controller.dart';
+import 'package:ruhul_ostab_project/ui/controllers/update_profile_controller.dart';
 import 'package:ruhul_ostab_project/ui/widgets/centered_circular_progress_indicator.dart';
 import 'package:ruhul_ostab_project/ui/widgets/screen_background.dart';
 import 'package:ruhul_ostab_project/ui/widgets/snack_bar_message.dart';
@@ -22,11 +23,14 @@ class UpdateProfileScreen extends StatefulWidget {
 }
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
+  final authController = Get.find<AuthController>();
+
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _firstNameTEController = TextEditingController();
   final TextEditingController _lastNameTEController = TextEditingController();
   final TextEditingController _phoneTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
+  final UpdateProfileController _updateProfileController = Get.find<UpdateProfileController>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _selectedImage;
@@ -121,13 +125,17 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  Visibility(
-                    visible: _updateProfileInProgress == false,
-                    replacement: CenteredCircularProgressIndicator(),
-                    child: ElevatedButton(
-                      onPressed: _onTapSubmitButton,
-                      child: Icon(Icons.arrow_circle_right_outlined),
-                    ),
+                  GetBuilder<UpdateProfileController>(
+                    builder: (controller) {
+                      return Visibility(
+                        visible: controller.inProgress == false,
+                        replacement: CenteredCircularProgressIndicator(),
+                        child: ElevatedButton(
+                          onPressed: _onTapSubmitButton,
+                          child: Icon(Icons.arrow_circle_right_outlined),
+                        ),
+                      );
+                    }
                   ),
                 ],
               ),
@@ -198,40 +206,34 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   }
 
   Future<void> _updateProfile() async {
+    String? pass;
+    String? pho;
     _updateProfileInProgress = true;
     if (mounted) {
       setState(() {});
     }
 
     Uint8List? imageBytes;
-
     Map<String, String> requestBody = {
-      "email": _emailTEController.text,
+      "email": _emailTEController.text.trim(),
       "firstName": _firstNameTEController.text.trim(),
       "lastName": _lastNameTEController.text.trim(),
       "mobile": _phoneTEController.text.trim(),
     };
 
     if (_passwordTEController.text.isNotEmpty) {
-      requestBody['password'] = _passwordTEController.text;
+   //   requestBody['password'] = _passwordTEController.text;
+      pass = _passwordTEController.text;
     }
 
     if (_selectedImage != null) {
       imageBytes = await _selectedImage!.readAsBytes();
-      requestBody['photo'] = base64Encode(imageBytes);
+    //  requestBody['photo'] = base64Encode(imageBytes);
+     pho= base64Encode(imageBytes);
     }
+    bool isSuccess = _updateProfileController.UpdateProfile(_emailTEController.text.trim(), _firstNameTEController.text.trim(), _lastNameTEController.text.trim(), _phoneTEController.text.trim(), pass, pho) as bool;
 
-    NetworkResponse response = await NetworkCaller.postRequest(
-      url: Urls.updateProfileUrl,
-      body: requestBody,
-    );
-
-    _updateProfileInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-
-    if (response.isSuccess) {
+    if (isSuccess) {
       UserModel userModel = UserModel(
           id: AuthController.userModel!.id,
           email: _emailTEController.text,
@@ -243,7 +245,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               : base64Encode(imageBytes)
       );
 
-      await AuthController.updateUserData(userModel);
+      await authController.updateUserData(userModel);
 
       _passwordTEController.clear();
       if (mounted) {
@@ -251,10 +253,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       }
     } else {
       if (mounted) {
-        showSnackBarMessage(context, response.errorMessage!);
+        showSnackBarMessage(context, _updateProfileController.errorMessage!);
       }
     }
   }
+
+
 
   @override
   void dispose() {

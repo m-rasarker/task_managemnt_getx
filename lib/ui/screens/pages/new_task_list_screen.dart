@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ruhul_ostab_project/data/models/task_status_count_model.dart';
-import 'package:ruhul_ostab_project/data/service/network_caller.dart';
-import 'package:ruhul_ostab_project/data/urls.dart';
+
 import 'package:ruhul_ostab_project/ui/controllers/new_task_list_controller.dart';
 import 'package:ruhul_ostab_project/ui/widgets/centered_circular_progress_indicator.dart';
-import 'package:ruhul_ostab_project/ui/widgets/snack_bar_message.dart';
+
 import 'package:ruhul_ostab_project/ui/widgets/task_card.dart';
 import 'package:ruhul_ostab_project/ui/widgets/task_count_summary_card.dart';
 
@@ -19,8 +18,8 @@ class NewTaskListScreen extends StatefulWidget {
 }
 
 class _NewTaskListScreenState extends State<NewTaskListScreen> {
-  bool _getTaskStatusCountInProgress = false;
-  List<TaskStatusCountModel> _taskStatusCountList = [];
+  // bool _getTaskStatusCountInProgress = false;
+  // List<TaskStatusCountModel> _taskStatusCountList = [];
 
   @override
   void initState() {

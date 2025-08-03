@@ -25,7 +25,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
   final TextEditingController _descriptionTEController =
   TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _addNewTaskInProgress = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +115,8 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
           }
     }
   }
+
+
 
   @override
   void dispose() {

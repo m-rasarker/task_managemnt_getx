@@ -1,10 +1,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:ruhul_ostab_project/data/service/network_caller.dart';
 import 'package:ruhul_ostab_project/data/urls.dart';
-import 'package:ruhul_ostab_project/ui/controllers/sign_up_controller.dart';
 import 'package:ruhul_ostab_project/ui/widgets/screen_background.dart';
 import 'package:ruhul_ostab_project/ui/widgets/snack_bar_message.dart';
 
@@ -24,8 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _phoneTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final SignUpController _signUpController = Get.find<SignUpController>();
-//  bool _signUpInProgress = false;
+  bool _signUpInProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -108,19 +105,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  GetBuilder<SignUpController>(
-                    builder: (controller) {
-                      return Visibility(
-                        visible: controller.inProgress == false,
-                        replacement: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: _onTapSignUpButton,
-                          child: Icon(Icons.arrow_circle_right_outlined),
-                        ),
-                      );
-                    }
+                  Visibility(
+                    visible: _signUpInProgress == false,
+                    replacement: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _onTapSignUpButton,
+                      child: Icon(Icons.arrow_circle_right_outlined),
+                    ),
                   ),
                   const SizedBox(height: 32),
 
@@ -163,55 +156,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-
   Future<void> _signUp() async {
+    _signUpInProgress = true;
+    setState(() {});
 
-    bool isSuccess = await _signUpController.SignUp(_emailTEController.text.trim(), _firstNameTEController.text.trim(), _lastNameTEController.text.trim(), _phoneTEController.text.trim(),  _passwordTEController.text);
+    Map<String, String> requestBody = {
+      "email": _emailTEController.text.trim(),
+      "firstName": _firstNameTEController.text.trim(),
+      "lastName": _lastNameTEController.text.trim(),
+      "mobile": _phoneTEController.text.trim(),
+      "password":  _passwordTEController.text
+    };
 
 
 
-    if (isSuccess) {
+
+    NetworkResponse response = await NetworkCaller.postRequest(
+      url: Urls.registrationUrl,
+      body: requestBody, isFromLogin: false,
+    );
+
+    _signUpInProgress = false;
+    setState(() {});
+
+    if (response.isSuccess) {
       _clearTextFields();
       showSnackBarMessage(context, 'Registration has been success. Please login');
     } else {
-      showSnackBarMessage(context, _signUpController.errorMessage!);
+      showSnackBarMessage(context, response.errorMessage!);
     }
   }
-
-
-
-
-  //
-  // Future<void> _signUp() async {
-  //   _signUpInProgress = true;
-  //   setState(() {});
-  //
-  //   Map<String, String> requestBody = {
-  //     "email": _emailTEController.text.trim(),
-  //     "firstName": _firstNameTEController.text.trim(),
-  //     "lastName": _lastNameTEController.text.trim(),
-  //     "mobile": _phoneTEController.text.trim(),
-  //     "password":  _passwordTEController.text
-  //   };
-  //
-  //
-  //
-  //
-  //   NetworkResponse response = await NetworkCaller.postRequest(
-  //     url: Urls.registrationUrl,
-  //     body: requestBody, isFromLogin: false,
-  //   );
-  //
-  //   _signUpInProgress = false;
-  //   setState(() {});
-  //
-  //   if (response.isSuccess) {
-  //     _clearTextFields();
-  //     showSnackBarMessage(context, 'Registration has been success. Please login');
-  //   } else {
-  //     showSnackBarMessage(context, response.errorMessage!);
-  //   }
-  // }
 
   void _clearTextFields() {
     _firstNameTEController.clear();
@@ -222,9 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _onTapSignInButton() {
-   // Navigator.pop(context);
-    Get.back();
-
+    Navigator.pop(context);
   }
 
   @override

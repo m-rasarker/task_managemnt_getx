@@ -192,7 +192,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       if(mounted) {
         showSnackBarMessage(context, "Password Changed Successfully");
       }
-      Navigator.pushReplacementNamed(context, SignInScreen.name);
+    //  Navigator.pushReplacementNamed(context, SignInScreen.name);
+      Get.offNamed(SignInScreen.name);
+
     } else {
       if (mounted)
       {
@@ -207,8 +209,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   void _onTapSignInButton() {
     // Navigator.pushNamedAndRemoveUntil(
     //     context, SignInScreen.name, (predicate) => false);
-
     Get.offAllNamed(SignInScreen.name);
+
   }
 
   @override

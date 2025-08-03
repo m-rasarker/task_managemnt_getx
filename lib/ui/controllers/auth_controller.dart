@@ -6,6 +6,10 @@ import 'package:get/get.dart';
 class AuthController extends GetxController{
   static UserModel? userModel;
   static String? accessToken;
+  // String userName = '';
+
+
+
 
 
 
@@ -17,14 +21,16 @@ class AuthController extends GetxController{
     await sharedPreferences.setString(_userDataKey, jsonEncode(model.toJson()));
     await sharedPreferences.setString(_tokenKey, token);
     userModel = model;
+
     accessToken = token;
 
   }
 
-  static Future<void> updateUserData(UserModel model) async {
+  Future<void> updateUserData(UserModel model) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(_userDataKey, jsonEncode(model.toJson()));
     userModel = model;
+    update();
 
   }
 

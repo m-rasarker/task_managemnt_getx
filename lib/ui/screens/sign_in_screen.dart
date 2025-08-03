@@ -150,14 +150,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _onTapForgotPasswordButton() {
    // Navigator.pushNamed(context, ForgotPasswordEmailScreen.name);
-
-    Get.offAllNamed(ForgotPasswordEmailScreen.name);
+    Get.toNamed(ForgotPasswordEmailScreen.name);
   }
 
   void _onTapSignUpButton() {
   //  Navigator.pushNamed(context, SignUpScreen.name);
-
-    Get.offAllNamed(SignUpScreen.name);
+    Get.toNamed(SignUpScreen.name);
   }
 
   @override

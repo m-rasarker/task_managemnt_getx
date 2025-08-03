@@ -61,7 +61,7 @@ class _CompletedTaskListScreenState extends State<CompletedTaskListScreen> {
 
     if (isSuccess) {
 
-
+          return;
     } else {
       if (mounted) {
         showSnackBarMessage(context, _completedTaskListController.errorMessage!);
