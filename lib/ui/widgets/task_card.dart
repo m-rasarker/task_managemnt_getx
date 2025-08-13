@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ruhul_ostab_project/ui/controllers/delete_task_controller.dart';
+import 'package:ruhul_ostab_project/ui/controllers/new_task_list_controller.dart';
+import 'package:ruhul_ostab_project/ui/controllers/update_stask_status_controller.dart';
 import 'package:ruhul_ostab_project/ui/widgets/snack_bar_message.dart';
-
+import 'package:get/get.dart';
 import '../../data/models/task_model.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/urls.dart';
@@ -30,7 +33,10 @@ class TaskCard extends StatefulWidget {
 
 class _TaskCardState extends State<TaskCard> {
   bool _updateTaskStatusInProgress = false;
+  bool _deleteTaskInProgress =false;
 
+  final UpdateStaskStatusController _updateStaskStatusController = Get.find<UpdateStaskStatusController>();
+  final DeleteTaskController _deleteTaskController = Get.find<DeleteTaskController>();
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -65,8 +71,13 @@ class _TaskCardState extends State<TaskCard> {
                     side: BorderSide.none,
                   ),
                 ),
-                Spacer(),
-                IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+                Spacer(), Visibility(
+                  visible: _deleteTaskInProgress == false,
+                  replacement: CenteredCircularProgressIndicator(),
+                  child: IconButton(onPressed: () {
+                    _showDeleteDialog();
+                  }, icon: Icon(Icons.delete)),
+                ),
                 Visibility(
                   visible: _updateTaskStatusInProgress == false,
                   replacement: CenteredCircularProgressIndicator(),
@@ -84,6 +95,7 @@ class _TaskCardState extends State<TaskCard> {
       ),
     );
   }
+
 
   Color _getTaskChipColor() {
     switch (widget.taskType) {
@@ -121,6 +133,63 @@ class _TaskCardState extends State<TaskCard> {
 
 
 
+  void _showDeleteDialog(){
+    showDialog(context: context, builder: (context)=>SimpleDialog(
+      title: Text(
+          'Are you confirmed to delete?',style: TextStyle(fontSize: 16),
+      ),
+      children: [
+       Row(
+         children: [
+           Expanded(
+             child: SimpleDialogOption(
+               child: Text('No'),
+               onPressed: ()=>Navigator.pop(context),
+             ),
+           ),
+           SimpleDialogOption(
+             child: Text('Yes'),
+             onPressed: _deleteTaskbyId,
+           )
+         ],
+
+       )
+
+      ],
+    ));
+  }
+
+
+
+
+
+
+  Future<void> _deleteTaskbyId() async {
+       bool isSuccess = await _deleteTaskController.DeleteTaksk(widget.taskModel.id);
+
+      if (isSuccess)
+        {
+          Navigator.pop(context);
+          Get.find<NewTaskListController>().getNewTaskList();
+          Get.find<NewTaskListController>().getTaskStatusCountList();
+
+          if(mounted)
+          {
+            showSnackBarMessage(context,"Task Deleted Successfully");
+          }
+          return;
+        }
+      else
+        {
+          if(mounted)
+            {
+              showSnackBarMessage(context,const Response().body);
+            }
+
+        }
+
+
+  }
 
 
   void _showEditTaskStatusDialog() {
@@ -191,8 +260,14 @@ class _TaskCardState extends State<TaskCard> {
   //
   // }
 
+
+
+
+
   Future<void> _updateTaskStatus(String status) async {
-    Navigator.pop(context);
+    // Navigator.pop(context);
+    Get.back();
+
     _updateTaskStatusInProgress = true;
     if (mounted) {
       setState(() {});
@@ -215,4 +290,43 @@ class _TaskCardState extends State<TaskCard> {
       }
     }
   }
+
+
+
+
+
+
+//
+// Future<void> _updateTaskStatus(String status) async {
+//    // Navigator.pop(context);
+//     Get.back();
+//
+//     _updateTaskStatusInProgress = true;
+//     if (mounted) {
+//       setState(() {});
+//     }
+//
+//     NetworkResponse response = await NetworkCaller.getRequest(
+//       url: Urls.updateTaskStatusUrl(widget.taskModel.id, status),
+//     );
+//
+//     _updateTaskStatusInProgress = false;
+//     if (mounted) {
+//       setState(() {});
+//     }
+//
+//     if (response.isSuccess) {
+//       widget.onStatusUpdate();
+//     } else {
+//       if (mounted) {
+//         showSnackBarMessage(context, response.errorMessage!);
+//       }
+//     }
+//   }
+
+
+
+
+
+
 }

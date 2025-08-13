@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ruhul_ostab_project/ui/controllers/add_new_task_controller.dart';
+import 'package:ruhul_ostab_project/ui/controllers/new_task_list_controller.dart';
 import '../../widgets/centered_circular_progress_indicator.dart';
 import '../../widgets/screen_background.dart';
 import '../../widgets/snack_bar_message.dart';
@@ -107,6 +108,8 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
       _titleTEController.clear();
       _descriptionTEController.clear();
       if (mounted) {
+        Get.find<NewTaskListController>().getNewTaskList();
+        Get.find<NewTaskListController>().getTaskStatusCountList();
         showSnackBarMessage(context, 'Added new task');
       }
     } else {

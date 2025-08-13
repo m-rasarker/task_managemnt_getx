@@ -3,13 +3,14 @@ import 'package:ruhul_ostab_project/ui/controllers/add_new_task_controller.dart'
 import 'package:ruhul_ostab_project/ui/controllers/auth_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/change_password_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/completed_task_list_controller.dart';
+import 'package:ruhul_ostab_project/ui/controllers/delete_task_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/forgot_password_email_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/new_task_list_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/pin_verification_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/progress_task_list_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/sign_in_controller.dart';
 import 'package:ruhul_ostab_project/ui/controllers/update_profile_controller.dart';
-import 'package:ruhul_ostab_project/ui/screens/pages/update_profile_screen.dart';
+import 'package:ruhul_ostab_project/ui/controllers/update_stask_status_controller.dart';
 
 import 'controllers/cancelled_task_list_controller.dart';
 
@@ -28,6 +29,10 @@ class ControllerBinder extends Bindings {
     Get.put(ChangePasswordController());
     Get.put(AuthController());
     Get.put(UpdateProfileController());
+    Get.put(UpdateStaskStatusController());
+    Get.put(DeleteTaskController());
+
+
 
 
   }
