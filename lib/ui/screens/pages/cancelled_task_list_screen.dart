@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ruhul_ostab_project/ui/widgets/centered_circular_progress_indicator.dart';
-import '../../../data/models/task_model.dart';
-import '../../../data/service/network_caller.dart';
-import '../../../data/urls.dart';
+
 import '../../controllers/cancelled_task_list_controller.dart';
-import '../../controllers/progress_task_list_controller.dart';
+
 import '../../widgets/snack_bar_message.dart';
 import '../../widgets/task_card.dart';
 
